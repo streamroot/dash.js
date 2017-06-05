@@ -22,7 +22,7 @@ angular.module('DashContributorsService', ['ngResource']).factory('contributors'
 app.controller('DashController', function($scope, sources, contributors) {
 
 
-    $scope.selectedItem = {url:"http://dash.edgesuite.net/akamai/bbb_30fps/bbb_30fps.mpd"};
+    $scope.selectedItem = {url:"http://cdn3-live.mlflux.net/public/chassepeche/chassepeche.isml/chassepeche.mpd"};
 
     sources.query(function (data) {
         $scope.availableStreams = data.items;
@@ -172,6 +172,7 @@ app.controller('DashController', function($scope, sources, contributors) {
 
     $scope.video = document.querySelector(".dash-video-player video");
     $scope.player = dashjs.MediaPlayer().create();
+    $scope.player.setLiveDelay(30);
     $scope.player.initialize($scope.video, null, $scope.autoPlaySelected);
     $scope.player.setFastSwitchEnabled(true);
     $scope.player.attachVideoContainer(document.getElementById("videoContainer"));
@@ -598,7 +599,7 @@ app.controller('DashController', function($scope, sources, contributors) {
     };
 
     $scope.plotPoint = function(name, type, value) {
-        if ($scope.chartEnabled) {
+        if ($scope.chartEnabled && $scope.chartState[type]) {
             var data = $scope.chartState[type][name].data;
             data.push([$scope.video.currentTime, value]);
             if (data.length > $scope.maxPointsToChart) {

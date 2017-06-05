@@ -55,6 +55,9 @@ function TimelineSegmentsGetter(config, isDynamic) {
             maxSegmentsAhead = (index > -1 || requestedTime !== null) ? 10 : Infinity;
         }
 
+
+        console.info('segment list metadata: ', index, requestedTime, maxSegmentsAhead);
+
         var time = 0;
         var scaledTime = 0;
         var availabilityIdx = -1;
@@ -106,6 +109,7 @@ function TimelineSegmentsGetter(config, isDynamic) {
         if (requestedTime !== null) {
             requiredMediaTime = timelineConverter.calcMediaTimeFromPresentationTime(requestedTime, representation);
         }
+        console.info('required: ', requiredMediaTime);
 
         for (i = 0, len = fragments.length; i < len; i++) {
             frag = fragments[i];
@@ -174,6 +178,8 @@ function TimelineSegmentsGetter(config, isDynamic) {
         if (!isAvailableSegmentNumberCalculated) {
             representation.availableSegmentsNumber = availabilityIdx + 1;
         }
+
+        console.info('segment list length: ', segments.length);
 
         return segments;
     }
