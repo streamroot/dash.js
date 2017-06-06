@@ -1600,7 +1600,7 @@ function MediaPlayer() {
     }
 
     /**
-     * Latency threshold in ms under which we that a segment request came back from cache
+     * Latency threshold in ms under which we assume that a segment request came back from cache
      *
      * @default 50ms
      * @param {int} value
@@ -1624,7 +1624,7 @@ function MediaPlayer() {
     }
 
     /**
-     * Download time threshold in ms under which we that a video segment request came back from cache
+     * Download time threshold in ms under which we assume that a video segment request came back from cache
      *
      * @default 50ms
      * @param {int} value
@@ -1648,7 +1648,7 @@ function MediaPlayer() {
     }
 
     /**
-     * Download time threshold in ms under which we that an audio segment request came back from cache
+     * Download time threshold in ms under which we assume that an audio segment request came back from cache
      *
      * @default 5ms
      * @param {int} value
