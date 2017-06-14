@@ -8,7 +8,8 @@
     "test": "mocha --require mochahook",
     "prepublish": "grunt prepublish",
     "debug": "iron-mocha --require mochahook",
-    "coverage": "istanbul cover node_modules/mocha/bin/_mocha --require mochahook -- test/"
+    "coverage": "istanbul cover node_modules/mocha/bin/_mocha --require mochahook -- test/",
+    "postinstall": "npm install && grunt babel:es5"
   },
   "devDependencies": {
     "babel": "^5.3.1",
