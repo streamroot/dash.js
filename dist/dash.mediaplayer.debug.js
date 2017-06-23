@@ -1998,7 +1998,7 @@ exports["default"] = X2JS;
 module.exports = exports["default"];
 
 },{}],4:[function(_dereq_,module,exports){
-/*! codem-isoboxer v0.3.2 https://github.com/madebyhiro/codem-isoboxer/blob/master/LICENSE.txt */
+/*! codem-isoboxer v0.3.4 https://github.com/madebyhiro/codem-isoboxer/blob/master/LICENSE.txt */
 var ISOBoxer = {};
 
 ISOBoxer.parseBuffer = function(arrayBuffer) {
@@ -2690,15 +2690,24 @@ ISOBox.prototype._writeTemplate = function(size, value) {
 };
 
 ISOBox.prototype._writeData = function(data) {
+  var i;
   if (data instanceof Array) {
-    data = new DataView(Uint8Array.from(data).buffer);
+    if (!Uint8Array.from) {
+      var typedArray = new Uint8Array(data.length);
+      for (i = 0; i < data.length; i++) {
+        typedArray[i] = data[i];
+      }
+      data = new DataView(typedArray.buffer);
+    } else {
+      data = new DataView(Uint8Array.from(data).buffer);
+    }
   }
   if (data instanceof Uint8Array) {
     data = new DataView(data.buffer);
   }
   if (this._rawo) {
     var offset = this._cursor.offset - this._rawo.byteOffset;
-    for (var i = 0; i < data.byteLength; i++) {
+    for (i = 0; i < data.byteLength; i++) {
         this._rawo.setUint8(offset + i, data.getUint8(i));
     }
     this._cursor.offset += data.byteLength;
@@ -12574,6 +12583,78 @@ function MediaPlayer() {
     }
 
     /**
+     * Latency threshold in ms under which we assume that a segment request came back from cache
+     *
+     * @default 50ms
+     * @param {int} value
+     * @memberof module:MediaPlayer
+     * @instance
+     */
+    function setCacheLoadThresholdLatency(value) {
+        mediaPlayerModel.setCacheLoadThresholdLatency(value);
+    }
+
+    /**
+     * Returns the number of the current CacheLoadThresholdLatency
+     *
+     * @return {number} value
+     * @see {@link module:MediaPlayer#setCacheLoadThresholdLatency setCacheLoadThresholdLatency()}
+     * @memberof module:MediaPlayer
+     * @instance
+     */
+    function getCacheLoadThresholdLatency() {
+        return mediaPlayerModel.getCacheLoadThresholdLatency();
+    }
+
+    /**
+     * Download time threshold in ms under which we assume that a video segment request came back from cache
+     *
+     * @default 50ms
+     * @param {int} value
+     * @memberof module:MediaPlayer
+     * @instance
+     */
+    function setCacheLoadThresholdVideo(value) {
+        mediaPlayerModel.setCacheLoadThresholdVideo(value);
+    }
+
+    /**
+     * Returns the number of the current CacheLoadThresholdVideo
+     *
+     * @return {number} value
+     * @see {@link module:MediaPlayer#setCacheLoadThresholdVideo setCacheLoadThresholdVideo()}
+     * @memberof module:MediaPlayer
+     * @instance
+     */
+    function getCacheLoadThresholdVideo() {
+        return mediaPlayerModel.getCacheLoadThresholdVideo();
+    }
+
+    /**
+     * Download time threshold in ms under which we assume that an audio segment request came back from cache
+     *
+     * @default 5ms
+     * @param {int} value
+     * @memberof module:MediaPlayer
+     * @instance
+     */
+    function setCacheLoadThresholdAudio(value) {
+        mediaPlayerModel.setCacheLoadThresholdAudio(value);
+    }
+
+    /**
+     * Returns the number of the current CacheLoadThresholdAudio
+     *
+     * @return {number} value
+     * @see {@link module:MediaPlayer#setCacheLoadThresholdAudio setCacheLoadThresholdAudio()}
+     * @memberof module:MediaPlayer
+     * @instance
+     */
+    function getCacheLoadThresholdAudio() {
+        return mediaPlayerModel.getCacheLoadThresholdAudio();
+    }
+
+    /**
      * A timeout value in seconds, which during the ABRController will block switch-up events.
      * This will only take effect after an abandoned fragment event occurs.
      *
@@ -13120,6 +13201,12 @@ function MediaPlayer() {
         enableBufferOccupancyABR: enableBufferOccupancyABR,
         setBandwidthSafetyFactor: setBandwidthSafetyFactor,
         getBandwidthSafetyFactor: getBandwidthSafetyFactor,
+        setCacheLoadThresholdLatency: setCacheLoadThresholdLatency,
+        getCacheLoadThresholdLatency: getCacheLoadThresholdLatency,
+        setCacheLoadThresholdVideo: setCacheLoadThresholdVideo,
+        getCacheLoadThresholdVideo: getCacheLoadThresholdVideo,
+        setCacheLoadThresholdAudio: setCacheLoadThresholdAudio,
+        getCacheLoadThresholdAudio: getCacheLoadThresholdAudio,
         setAbandonLoadTimeout: setAbandonLoadTimeout,
         retrieveManifest: retrieveManifest,
         addUTCTimingSource: addUTCTimingSource,
@@ -21123,6 +21210,9 @@ var DEFAULT_LOCAL_STORAGE_BITRATE_EXPIRATION = 360000;
 var DEFAULT_LOCAL_STORAGE_MEDIA_SETTINGS_EXPIRATION = 360000;
 
 var BANDWIDTH_SAFETY_FACTOR = 0.9;
+var CACHE_LOAD_THRESHOLD_VIDEO = 50;
+var CACHE_LOAD_THRESHOLD_AUDIO = 5;
+var CACHE_LOAD_THRESHOLD_LATENCY = 50;
 var ABANDON_LOAD_TIMEOUT = 10000;
 
 var BUFFER_TO_KEEP = 30;
@@ -21167,6 +21257,9 @@ function MediaPlayerModel() {
         longFormContentDurationThreshold = undefined,
         richBufferThreshold = undefined,
         bandwidthSafetyFactor = undefined,
+        cacheLoadThresholdLatency = undefined,
+        cacheLoadThresholdVideo = undefined,
+        cacheLoadThresholdAudio = undefined,
         abandonLoadTimeout = undefined,
         retryAttempts = undefined,
         retryIntervals = undefined,
@@ -21196,6 +21289,9 @@ function MediaPlayerModel() {
         longFormContentDurationThreshold = LONG_FORM_CONTENT_DURATION_THRESHOLD;
         richBufferThreshold = RICH_BUFFER_THRESHOLD;
         bandwidthSafetyFactor = BANDWIDTH_SAFETY_FACTOR;
+        cacheLoadThresholdLatency = CACHE_LOAD_THRESHOLD_LATENCY;
+        cacheLoadThresholdVideo = CACHE_LOAD_THRESHOLD_VIDEO;
+        cacheLoadThresholdAudio = CACHE_LOAD_THRESHOLD_AUDIO;
         abandonLoadTimeout = ABANDON_LOAD_TIMEOUT;
         wallclockTimeUpdateInterval = WALLCLOCK_TIME_UPDATE_INTERVAL;
         xhrWithCredentials = { 'default': DEFAULT_XHR_WITH_CREDENTIALS };
@@ -21220,6 +21316,30 @@ function MediaPlayerModel() {
 
     function getBandwidthSafetyFactor() {
         return bandwidthSafetyFactor;
+    }
+
+    function setCacheLoadThresholdLatency(value) {
+        cacheLoadThresholdLatency = value;
+    }
+
+    function getCacheLoadThresholdLatency() {
+        return cacheLoadThresholdLatency;
+    }
+
+    function setCacheLoadThresholdVideo(value) {
+        cacheLoadThresholdVideo = value;
+    }
+
+    function getCacheLoadThresholdVideo() {
+        return cacheLoadThresholdVideo;
+    }
+
+    function setCacheLoadThresholdAudio(value) {
+        cacheLoadThresholdAudio = value;
+    }
+
+    function getCacheLoadThresholdAudio() {
+        return cacheLoadThresholdAudio;
     }
 
     function setAbandonLoadTimeout(value) {
@@ -21434,6 +21554,12 @@ function MediaPlayerModel() {
         getBufferOccupancyABREnabled: getBufferOccupancyABREnabled,
         setBandwidthSafetyFactor: setBandwidthSafetyFactor,
         getBandwidthSafetyFactor: getBandwidthSafetyFactor,
+        setCacheLoadThresholdLatency: setCacheLoadThresholdLatency,
+        getCacheLoadThresholdLatency: getCacheLoadThresholdLatency,
+        setCacheLoadThresholdVideo: setCacheLoadThresholdVideo,
+        getCacheLoadThresholdVideo: getCacheLoadThresholdVideo,
+        setCacheLoadThresholdAudio: setCacheLoadThresholdAudio,
+        getCacheLoadThresholdAudio: getCacheLoadThresholdAudio,
         setAbandonLoadTimeout: setAbandonLoadTimeout,
         getAbandonLoadTimeout: getAbandonLoadTimeout,
         setLastBitrateCachingInfo: setLastBitrateCachingInfo,
@@ -24264,9 +24390,6 @@ function ThroughputRule(config) {
     var AVERAGE_THROUGHPUT_SAMPLE_AMOUNT_LIVE = 3;
     var AVERAGE_THROUGHPUT_SAMPLE_AMOUNT_VOD = 4;
     var AVERAGE_LATENCY_SAMPLES = AVERAGE_THROUGHPUT_SAMPLE_AMOUNT_VOD;
-    var CACHE_LOAD_THRESHOLD_VIDEO = 50;
-    var CACHE_LOAD_THRESHOLD_AUDIO = 5;
-    var CACHE_LOAD_THRESHOLD_LATENCY = 50;
     var THROUGHPUT_DECREASE_SCALE = 1.3;
     var THROUGHPUT_INCREASE_SCALE = 1.3;
 
@@ -24345,19 +24468,22 @@ function ThroughputRule(config) {
     }
 
     function isCachedResponse(latency, downloadTime, mediaType) {
+        var cacheLoadThresholdLatency = mediaPlayerModel.getCacheLoadThresholdLatency();
+        var cacheLoadThresholdVideo = mediaPlayerModel.getCacheLoadThresholdVideo();
+        var cacheLoadThresholdAudio = mediaPlayerModel.getCacheLoadThresholdAudio();
         var ret = false;
 
-        if (latency < CACHE_LOAD_THRESHOLD_LATENCY) {
+        if (latency < cacheLoadThresholdLatency) {
             ret = true;
         }
 
         if (!ret) {
             switch (mediaType) {
                 case 'video':
-                    ret = downloadTime < CACHE_LOAD_THRESHOLD_VIDEO;
+                    ret = downloadTime < cacheLoadThresholdVideo;
                     break;
                 case 'audio':
-                    ret = downloadTime < CACHE_LOAD_THRESHOLD_AUDIO;
+                    ret = downloadTime < cacheLoadThresholdAudio;
                     break;
                 default:
                     break;
