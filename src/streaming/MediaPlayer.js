@@ -1209,6 +1209,18 @@ function MediaPlayer() {
     }
 
     /**
+     * Returns the average throughput computed in the ABR logic
+     *
+     * @param {string} type
+     * @return {number} value
+     * @memberof module:MediaPlayer
+     * @instance
+     */
+    function getAverageThroughput(type) {
+        return abrController.getAverageThroughput(type);
+    }
+
+    /**
      * Set to false to switch off adaptive bitrate switching.
      *
      * @deprecated since version 2.0 Instead use {@link module:MediaPlayer#setAutoSwitchQualityFor setAutoSwitchQualityFor()}.
@@ -2180,6 +2192,7 @@ function MediaPlayer() {
         getFastSwitchEnabled: getFastSwitchEnabled,
         getAutoSwitchQualityFor: getAutoSwitchQualityFor,
         setAutoSwitchQualityFor: setAutoSwitchQualityFor,
+        getAverageThroughput: getAverageThroughput,
         enableBufferOccupancyABR: enableBufferOccupancyABR,
         setBandwidthSafetyFactor: setBandwidthSafetyFactor,
         getBandwidthSafetyFactor: getBandwidthSafetyFactor,
