@@ -62,14 +62,24 @@ function TemplateSegmentsGetter(config, isDynamic) {
 
         start = representation.startNumber;
 
-        if (isNaN(duration) && !isDynamic) {
-            segmentRange = { start: start, end: start };
+        if (requestedTime && representation.segmentDuration && availabilityUpperLimit !== undefined) {
+            // Use simpler logic based on requestedTime when requestedTime is > 0.
+            // Use it only when availabilityUpperLimit is defined (calls from our wrapper) to avoid changing dash.js logic: this is some overcomplicated logic here
+            // and many different use cases here (live vs VOD, index vs time) so we want to avoid breaking dash.js internal because of some obscure bug
+            var minBufferTime = representation.adaptation.period.mpd.manifest.minBufferTime;
+            availabilityUpperLimit = availabilityUpperLimit || Math.max(2 * minBufferTime, 10 * duration);
+            startIdx = Math.max(Math.min(Math.floor(requestedTime / representation.segmentDuration), availabilityWindow.end), availabilityWindow.start);
+            endIdx = Math.max(Math.min(Math.floor(requestedTime + availabilityUpperLimit / representation.segmentDuration), availabilityWindow.end), availabilityWindow.start);
         } else {
-            segmentRange = (0, _SegmentsUtils.decideSegmentListRangeForTemplate)(timelineConverter, isDynamic, representation, requestedTime, index, availabilityUpperLimit);
-        }
+            if (isNaN(duration) && !isDynamic) {
+                segmentRange = { start: start, end: start };
+            } else {
+                segmentRange = (0, _SegmentsUtils.decideSegmentListRangeForTemplate)(timelineConverter, isDynamic, representation, requestedTime, index, availabilityUpperLimit);
+            }
 
-        startIdx = segmentRange.start;
-        endIdx = segmentRange.end;
+            startIdx = segmentRange.start;
+            endIdx = segmentRange.end;
+        }
 
         for (periodSegIdx = startIdx; periodSegIdx <= endIdx; periodSegIdx++) {
 
