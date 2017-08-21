@@ -57,15 +57,22 @@ function TemplateSegmentsGetter(config, isDynamic) {
 
         start = representation.startNumber;
 
-        if (isNaN(duration) && !isDynamic) {
-            segmentRange = {start: start, end: start};
-        }
-        else {
-            segmentRange = decideSegmentListRangeForTemplate(timelineConverter, isDynamic, representation, requestedTime, index, availabilityUpperLimit);
-        }
+        if (requestedTime && representation.segmentDuration) {
+            var minBufferTime = representation.adaptation.period.mpd.manifest.minBufferTime;
+            availabilityUpperLimit = availabilityUpperLimit || Math.max(2 * minBufferTime, 10 * duration);
+            startIdx = Math.max(Math.min(Math.floor(requestedTime / representation.segmentDuration), availabilityWindow.end), availabilityWindow.start);
+            endIdx = Math.max(Math.min(Math.floor(requestedTime + availabilityUpperLimit / representation.segmentDuration), availabilityWindow.end), availabilityWindow.start);
+        } else {
+            if (isNaN(duration) && !isDynamic) {
+                segmentRange = {start: start, end: start};
+            }
+            else {
+                segmentRange = decideSegmentListRangeForTemplate(timelineConverter, isDynamic, representation, requestedTime, index, availabilityUpperLimit);
+            }
 
-        startIdx = segmentRange.start;
-        endIdx = segmentRange.end;
+            startIdx = segmentRange.start;
+            endIdx = segmentRange.end;
+        }
 
         for (periodSegIdx = startIdx; periodSegIdx <= endIdx; periodSegIdx++) {
 
