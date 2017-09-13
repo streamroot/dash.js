@@ -45,6 +45,8 @@ const DEFAULT_LOCAL_STORAGE_BITRATE_EXPIRATION = 360000;
 const DEFAULT_LOCAL_STORAGE_MEDIA_SETTINGS_EXPIRATION = 360000;
 
 const BANDWIDTH_SAFETY_FACTOR = 0.9;
+const CACHE_LOAD_THRESHOLD_VIDEO = 50;
+const CACHE_LOAD_THRESHOLD_AUDIO = 5;
 const ABANDON_LOAD_TIMEOUT = 10000;
 
 const BUFFER_TO_KEEP = 30;
@@ -87,6 +89,8 @@ function MediaPlayerModel() {
         bufferTimeAtTopQualityLongForm,
         longFormContentDurationThreshold,
         bandwidthSafetyFactor,
+        cacheLoadThresholdVideo,
+        cacheLoadThresholdAudio,
         abandonLoadTimeout,
         retryAttempts,
         retryIntervals,
@@ -123,6 +127,8 @@ function MediaPlayerModel() {
         bufferTimeAtTopQualityLongForm = BUFFER_TIME_AT_TOP_QUALITY_LONG_FORM;
         longFormContentDurationThreshold = LONG_FORM_CONTENT_DURATION_THRESHOLD;
         bandwidthSafetyFactor = BANDWIDTH_SAFETY_FACTOR;
+        cacheLoadThresholdVideo = CACHE_LOAD_THRESHOLD_VIDEO;
+        cacheLoadThresholdAudio = CACHE_LOAD_THRESHOLD_AUDIO;
         abandonLoadTimeout = ABANDON_LOAD_TIMEOUT;
         wallclockTimeUpdateInterval = WALLCLOCK_TIME_UPDATE_INTERVAL;
         xhrWithCredentials = {
@@ -219,6 +225,22 @@ function MediaPlayerModel() {
 
     function getBandwidthSafetyFactor() {
         return bandwidthSafetyFactor;
+    }
+
+    function setCacheLoadThresholdVideo(value) {
+        cacheLoadThresholdVideo = value;
+    }
+
+    function getCacheLoadThresholdVideo() {
+        return cacheLoadThresholdVideo;
+    }
+
+    function setCacheLoadThresholdAudio(value) {
+        cacheLoadThresholdAudio = value;
+    }
+
+    function getCacheLoadThresholdAudio() {
+        return cacheLoadThresholdAudio;
     }
 
     function setAbandonLoadTimeout(value) {
@@ -456,6 +478,10 @@ function MediaPlayerModel() {
         removeAllABRCustomRule: removeAllABRCustomRule,
         setBandwidthSafetyFactor: setBandwidthSafetyFactor,
         getBandwidthSafetyFactor: getBandwidthSafetyFactor,
+        setCacheLoadThresholdVideo: setCacheLoadThresholdVideo,
+        getCacheLoadThresholdVideo: getCacheLoadThresholdVideo,
+        setCacheLoadThresholdAudio: setCacheLoadThresholdAudio,
+        getCacheLoadThresholdAudio: getCacheLoadThresholdAudio,
         setAbandonLoadTimeout: setAbandonLoadTimeout,
         getAbandonLoadTimeout: getAbandonLoadTimeout,
         setLastBitrateCachingInfo: setLastBitrateCachingInfo,

@@ -51,9 +51,6 @@ function ThroughputHistory(config) {
     const EWMA_LATENCY_SLOW_HALF_LIFE_COUNT = 2;
     const EWMA_LATENCY_FAST_HALF_LIFE_COUNT = 1;
 
-    const CACHE_LOAD_THRESHOLD_VIDEO = 50;
-    const CACHE_LOAD_THRESHOLD_AUDIO = 5;
-
     const mediaPlayerModel = config.mediaPlayerModel;
 
     let throughputDict,
@@ -72,10 +69,12 @@ function ThroughputHistory(config) {
     }
 
     function isCachedResponse(mediaType, latencyMs, downloadTimeMs) {
+        let cacheLoadThresholdVideo = mediaPlayerModel.getCacheLoadThresholdVideo();
+        let cacheLoadThresholdAudio = mediaPlayerModel.getCacheLoadThresholdAudio();
         if (mediaType === Constants.VIDEO) {
-            return downloadTimeMs < CACHE_LOAD_THRESHOLD_VIDEO;
+            return downloadTimeMs < cacheLoadThresholdVideo;
         } else if (mediaType === Constants.AUDIO) {
-            return downloadTimeMs < CACHE_LOAD_THRESHOLD_AUDIO;
+            return downloadTimeMs < cacheLoadThresholdAudio;
         }
     }
 
